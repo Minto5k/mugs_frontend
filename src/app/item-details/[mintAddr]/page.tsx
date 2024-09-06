@@ -221,7 +221,7 @@ const ItemDetails: NextPage = () => {
             getAllListedNFTs(),
             getAllCollectionData(),
           ]);
-
+          setUpdatedPrice(0);
           successAlert("Success");
         } else {
           itemDetail.solPrice = currentPrice;
@@ -285,6 +285,7 @@ const ItemDetails: NextPage = () => {
 
   // Listed NFT Price Update Function
   const handleUpdatePriceFunc = async () => {
+    console.log("Update price..", updatedPrice);
     if (!wallet || itemDetail === undefined) {
       return;
     }
@@ -789,7 +790,8 @@ const ItemDetails: NextPage = () => {
                            bidPrice !== 0) ||
                          (itemDetail?.minIncrease !== 0 &&
                            wallet?.publicKey.toBase58() ===
-                             itemDetail?.seller)) &&
+                             itemDetail?.seller) ||
+                         typeParam !== "auction") &&
                        "hidden"
                      }`}
                       placeholder="Input the price"
@@ -801,9 +803,15 @@ const ItemDetails: NextPage = () => {
                     <input
                       className={`w-full p-[5px] items-center placeholder:text-gray-500 outline-none text-white justify-between rounded-md border border-customborder bg-transparent
                      ${
-                       typeParam !== "auction" &&
-                       itemDetail?.minIncrease === undefined &&
-                       itemDetail?.solPrice !== 0
+                       (typeParam !== "auction" &&
+                         itemDetail?.minIncrease === undefined &&
+                         itemDetail?.solPrice !== 0) ||
+                       (typeParam !== "auction" &&
+                         itemDetail?.minIncrease === 0 &&
+                         itemDetail?.solPrice === 0) ||
+                       (typeParam !== "auction" &&
+                         itemDetail?.endTime !== undefined &&
+                         wallet?.publicKey.toBase58() !== itemDetail?.seller)
                          ? "flex"
                          : "hidden"
                      }`}
@@ -870,28 +878,31 @@ const ItemDetails: NextPage = () => {
                       }
                     />
                   </div>
+                  <div className="w-full flex items-center justify-center gap-2">
+                    <AuctionButton
+                      wallet={wallet}
+                      selectedNFT={itemDetail}
+                      handleCreateAuctionMyNFTFunc={openAuctionModal}
+                      handleCancelAuctionMyNFTFunc={
+                        handleCancelAuctionMyNFTFunc
+                      }
+                      typeParam={"auction"}
+                    />
+                  </div>
+                  <BuyNowButton
+                    wallet={wallet}
+                    selectedNFT={itemDetail}
+                    handleBuyNFTFunc={handleBuyNFTFunc}
+                    typeParam={
+                      itemDetail?.endTime !== undefined ? "auction" : ""
+                    }
+                  />
                 </div>
               ) : (
                 <p className="text-white uppercase">
                   please connect the wallet
                 </p>
               )}
-
-              <div className="w-full flex items-center justify-center gap-2">
-                <AuctionButton
-                  wallet={wallet}
-                  selectedNFT={itemDetail}
-                  handleCreateAuctionMyNFTFunc={openAuctionModal}
-                  handleCancelAuctionMyNFTFunc={handleCancelAuctionMyNFTFunc}
-                  typeParam={"auction"}
-                />
-              </div>
-              <BuyNowButton
-                wallet={wallet}
-                selectedNFT={itemDetail}
-                handleBuyNFTFunc={handleBuyNFTFunc}
-                typeParam={itemDetail?.endTime !== undefined ? "auction" : ""}
-              />
             </div>
             <div
               className="w-full p-3 flex items-center justify-between rounded-md border border-customborder cursor-pointer"

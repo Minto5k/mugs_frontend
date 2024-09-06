@@ -95,7 +95,10 @@ const Market: NextPage = () => {
   }, [collectionAddr, collectionData]);
 
   useEffect(() => {
-    if (!collectionAddr || !listedAllNFTs.length || !publicKey) return;
+    if (!collectionAddr || !listedAllNFTs.length || !publicKey) {
+      setFilterLoading(false);
+      return;
+    }
 
     const filteredNFTs = listedAllNFTs.filter(
       (item) =>
@@ -104,6 +107,7 @@ const Market: NextPage = () => {
         publicKey?.toBase58() !== item.seller
     );
     setFilterListedNFTData(filteredNFTs);
+    console.log("Herere is");
     setFilterLoading(false);
   }, [collectionAddr, listedAllNFTs, publicKey]);
 
